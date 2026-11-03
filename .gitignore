@@ -218,3 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Ignorar arquivos temporários criados ao abrir os .csv no LibreOffice
+.~lock.*#
