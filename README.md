@@ -90,7 +90,7 @@ Este modelo do Google pode não ser recomendável em ambientes de produção, de
 ## Limitações 
 
 - **Modelo Gratuito:** Aparecem erros quando o limite de usuários é atingido. Apesar de dados pessoais não serem utilizados para o treinamento do modelo, a privacidade não é a mesma quando comparado com modelos pagos.
-- **Direito de arrependimento:** os dados só têm a previsão de entrega, não a data real de recebimento.
+- **Direito de arrependimento:** os dados só têm a previsão de entrega, não a data real de recebimento
 
 ## Uso de assistentes de código
 
