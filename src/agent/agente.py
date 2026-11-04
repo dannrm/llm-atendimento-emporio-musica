@@ -4,8 +4,9 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 from google import genai
-from google.genai import types
+from google.genai import types,errors
 from src.agent.prompt import carregar_prompt
+from src.data.buscar_db import buscar_produtos, consultar_pedido, listar_promocoes_ativas
 
 #Def. os dias da semana
 DIAS = ["segunda-feira",
@@ -39,7 +40,8 @@ class Agente:
         self.chat = self.cliente.chats.create(
             model=modelo,
             config=types.GenerateContentConfig(
-                system_instruction=system_prompt
+                system_instruction=system_prompt,
+                tools = [buscar_produtos, consultar_pedido, listar_promocoes_ativas],
             ),
         )
 
@@ -50,7 +52,7 @@ class Agente:
 
 if __name__ == "__main__":
     agente = Agente()
-    print("Olá! Sou a Lady Gaita! 👩‍🦳🪗  \n"
+    print("Olá! Sou a Lady Gaita! Sua atendente virtual! 👩‍🦳🪗  \n"
         "Como posso te ajudar hoje? — digite 'sair' para encerrar.")
 
     #Laco criado para manter a comunicacao usuário <-> agente
@@ -64,4 +66,11 @@ if __name__ == "__main__":
         if not mensagem:
             continue
 
-        print(f"\nLady Gaita: {agente.responder(mensagem)}\n")
+        try:
+            print(f"\nLady Gaita: {agente.responder(mensagem)}\n")
+        except errors.APIError as erro:
+            if erro.code in (429, 503):
+                print("\nLady Gaita: Estou com muitas mensagens agora 😅 "
+                      "Tenta de novo em um minutinho!\n")
+            else:
+                raise
