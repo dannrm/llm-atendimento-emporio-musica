@@ -10,7 +10,7 @@ RAIZ_PROJETO = Path(__file__).resolve().parents[2]
 DATA_DIR = RAIZ_PROJETO / "data"
 PREFIXO = "desafio_tecnico_ai_eng - "
 
-MAX_RESULTADOS = 10
+MAX_RESULTADOS = 20
 
 #Tradução dos status dos pedidos para evitar ambiguidade quando verificado pelo agente.
 STATUS_PEDIDO = {
@@ -92,20 +92,41 @@ def informacao_produto(linha: pd.Series) -> dict:
         }
     return produto
 
-#Busca o produto no banco de dados da loja (args: nome, categoria e preço)
+# Busca o produto no banco de dados da loja (args: nome, categoria e preço)
 def buscar_produtos(termo: str = "", categoria: str = "", preco_maximo: float = 0) -> list[dict]:
+    """Busca instrumentos no catálogo da loja.
+
+    Use sempre que o cliente perguntar sobre preço, disponibilidade, estoque,
+    modelos ou opções de instrumentos. Todos os parâmetros são opcionais.
+
+    Args:
+        termo: Nome, marca ou modelo do produto (ex.: "Takamine GD20", "Yamaha").
+        categoria: Tipo de instrumento (ex.: "violão", "guitarra", "ukulele").
+        preco_maximo: Preço máximo em reais. Use 0 para não limitar.
+
+    Returns:
+        Lista de produtos encontrados (no máximo 10). Lista vazia se nenhum
+        produto corresponder à busca.
+    """
+    texto_categoria = categoria or termo
+    if texto_categoria:
+        cat = unidecode(texto_categoria).lower().strip()
+        # Encontra produtos no singular e no plural
+        singular_plural = {cat, cat.rstrip("s")}
+        if cat.endswith("ao"):
+            singular_plural.add(cat[:-2] + "oes")
+        padrao = "|".join(re.escape(v) for v in singular_plural)
+
+        # Se o termo for um tipo de instrumento ("violão"), ele é tratado como categoria
+        if not categoria and produtos["categoria_busca"].str.contains(padrao).any():
+            categoria, termo = termo, ""
+
     if termo:
         resultado = produtos
     else:
         resultado = produtos[produtos["status"] != "discontinued"]
 
     if categoria:
-        cat = unidecode(categoria).lower().strip()
-        # Encontra produtos no singular e no plural
-        singular_plural = {cat, cat.rstrip("s")}
-        if cat.endswith("ao"):
-            singular_plural.add(cat[:-2] + "oes")
-        padrao = "|".join(re.escape(v) for v in singular_plural)
         resultado = resultado[resultado["categoria_busca"].str.contains(padrao)]
 
     if preco_maximo and preco_maximo > 0:

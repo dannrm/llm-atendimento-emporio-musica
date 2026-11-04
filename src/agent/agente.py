@@ -52,12 +52,15 @@ class Agente:
 
 if __name__ == "__main__":
     agente = Agente()
-    print("Olá! Sou a Lady Gaita! Sua atendente virtual! 👩‍🦳🪗  \n"
-        "Como posso te ajudar hoje? — digite 'sair' para encerrar.")
+    print("PT-BR: Olá! Sou a Lady Gaita! Sua atendente virtual! 👩‍🦳🪗  \n"
+        "Por favor, me diga seu nome e como posso te ajudar hoje? — digite 'sair' para encerrar.\n")
+
+    print("EN: Hi! I'm Lady Gaita! Your virtual assistant! 👩‍🦳🪗  "
+          "Could you please tell me your name and how can I help you today — text 'exit' to finish our conversation.\n")
 
     #Laco criado para manter a comunicacao usuário <-> agente
     while True:
-        mensagem = input("Você: ").strip()
+        mensagem = input(" ").strip()
 
         if mensagem.lower() in ("sair", "exit", "quit"):
             print("Até a próxima! 🎶")
@@ -69,8 +72,11 @@ if __name__ == "__main__":
         try:
             print(f"\nLady Gaita: {agente.responder(mensagem)}\n")
         except errors.APIError as erro:
+            #As linhas abaixos são necessárias caso o agente fique sobrecarregado
             if erro.code in (429, 503):
                 print("\nLady Gaita: Estou com muitas mensagens agora 😅 "
                       "Tenta de novo em um minutinho!\n")
+                print("\nLady Gaita: I'm busy now 😅 "
+                      "Try again later!\n")
             else:
                 raise
